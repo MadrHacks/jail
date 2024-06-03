@@ -24,7 +24,7 @@ RUN mkdir /srv/app && ln -s /bin/sh /srv/app/run
 
 Then, build and run the container with:
 ```sh
-docker run -p 5000:5000 --privileged $(docker build -q .)
+docker run -p 5000:5000 --security-opt seccomp=unconfined --cap-add=SYS_ADMIN $(docker build -q .)
 ```
 
 To connect, run:
@@ -63,6 +63,8 @@ To configure these, [use `ENV`](https://docs.docker.com/engine/reference/builder
 | `JAIL_DEV`          | `null,zero,urandom` | Device files available in `/dev` separated by `,`                                                                           |
 | `JAIL_SYSCALLS`     | _(none)_            | Additional allowed syscall names separated by `,`                                                                           |
 | `JAIL_TMP_SIZE`     | `0`                 | Maximum size of writable `/tmp` directory in each jail. If set to `0`, the writable `/tmp` directory is unavailable.        |
+| `JAIL_FLAG`         | `""`                | Flag to be written inside `/app/flag`. If `""`, nothing will be written |
+| `JAIL_FLAG_IN_ENV`  | `false`             | If `true`, `JAIL_FLAG` will be written in the `FLAG` environment variable instead of `/app/flag` |
 | `JAIL_ENV_*`        | _(none)_            | Environment variables available in each jail (with the `JAIL_ENV_` prefix removed)                                          |
 
 If it exists, `/jail/hook.sh` is executed before the jail starts. Use this script to configure nsjail options or the execution environment.
