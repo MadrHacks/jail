@@ -44,6 +44,9 @@ func run() error {
 	if err := config.MountDev(cfg.Dev); err != nil {
 		return err
 	}
+	if err := config.MountProc(); err != nil {
+		return err
+	}
 	if err := config.RunHook(); err != nil {
 		return err
 	}
