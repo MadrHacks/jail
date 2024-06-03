@@ -41,6 +41,9 @@ func run() error {
 	if err := config.WriteConfig(msg); err != nil {
 		return err
 	}
+	if _, err := config.WriteFlag(cfg); err != nil {
+		return err
+	}
 	if err := config.MountDev(cfg.Dev); err != nil {
 		return err
 	}

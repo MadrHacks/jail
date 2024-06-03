@@ -37,6 +37,8 @@ type Config struct {
 	Dev        []string `env:"JAIL_DEV" envDefault:"null,zero,urandom"`
 	Syscalls   []string `env:"JAIL_SYSCALLS"`
 	TmpSize    size     `env:"JAIL_TMP_SIZE"`
+	Flag       string   `env:"JAIL_FLAG" envDefault:""`
+	FlagInEnv  bool     `env:"JAIL_FLAG_IN_ENV" envDefault:"false"`
 	Env        []string
 }
 
@@ -115,6 +117,9 @@ func (c *Config) SetConfig(msg *nsjail.NsJailConfig) error {
 			Nosuid:  proto.Bool(true),
 		})
 	}
+	if c.FlagInEnv {
+		c.Env = append(c.Env, "FLAG="+c.Flag)
+	}
 	msg.Envar = c.Env
 	return nil
 }
@@ -126,6 +131,28 @@ func mountTmp() error {
 		return fmt.Errorf("mount tmpfs: %w", err)
 	}
 	return nil
+}
+
+func WriteFlag(c *Config) (bool, error) {
+	if c.Flag == "" || c.FlagInEnv {
+		return false, nil
+	}
+
+	if err := os.MkdirAll("/tmp/jail/app", 0755); err != nil {
+		return false, err
+	}
+
+	err := os.WriteFile("/tmp/jail/app/flag", []byte(c.Flag), 0444)
+	if err != nil {
+		return false, err
+	}
+
+	// Remount srv as overlayfs with /tmp/jail
+	if err := unix.Mount("overlay", "/srv", "overlay", 0, "lowerdir=/srv:/tmp/jail"); err != nil {
+		return false, fmt.Errorf("mount overlay: %w", err)
+	}
+
+	return true, nil
 }
 
 func WriteConfig(msg *nsjail.NsJailConfig) error {
