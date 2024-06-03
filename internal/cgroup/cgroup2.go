@@ -18,7 +18,7 @@ func (c *cgroup2) Mount() error {
 		return fmt.Errorf("mount cgroup2 to %s: %w", mountPath, err)
 	}
 	jailPath := mountPath + "/jail"
-	if err := os.Mkdir(jailPath, 0700); err != nil {
+	if err := os.MkdirAll(jailPath, 0700); err != nil {
 		return err
 	}
 	if err := os.WriteFile(jailPath+"/cgroup.procs", []byte("0"), 0); err != nil {
@@ -31,7 +31,7 @@ func (c *cgroup2) Mount() error {
 		return err
 	}
 	runPath := mountPath + "/run"
-	if err := os.Mkdir(runPath, 0700); err != nil {
+	if err := os.MkdirAll(runPath, 0700); err != nil {
 		return err
 	}
 	if err := os.WriteFile(runPath+"/cgroup.subtree_control", []byte("+pids +memory +cpu"), 0); err != nil {
