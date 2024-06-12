@@ -148,7 +148,7 @@ func WriteFlag(c *Config) (bool, error) {
 	}
 
 	// Remount srv as overlayfs with /tmp/jail
-	if err := unix.Mount("overlay", "/srv", "overlay", 0, "lowerdir=/srv:/tmp/jail"); err != nil {
+	if err := unix.Mount("overlay", "/srv", "overlay", 0, "lowerdir=/tmp/jail:/srv"); err != nil {
 		return false, fmt.Errorf("mount overlay: %w", err)
 	}
 
